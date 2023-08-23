@@ -1,0 +1,118 @@
+pseudocode:
+
+while (1) {
+
+    =================================== * ALREADY CODED * ===================================
+
+    if (exit) {
+        break
+    } else if ( help ) {
+        print help function
+    } else if ( pwd ) {
+        print current working directory
+    } else if ( cd ) {
+        change directory
+    } 
+    
+    =================================== * NOT CODED YET * ===================================
+
+
+    else if (  CONTAINS A PATH TO A PROGRAM   &&  ONLY ITS ARGUMENTS) { // can check using if there are characters such as < > or |
+
+
+        char *arguments[];
+        
+        while (ALL ARGUMENTS ARE NOT STORED IN arguments[] ) {
+            ADD ALL THE AGUMENTS;
+        }
+
+        int checkingForChildProcess = fork();
+
+        if (checkingForChildProcess == 0) {
+            if ( execv (PATH_TO_PROGRAM, arguments) < 0 ) {
+                printf("FAIL");
+                exit(EXIT_FAILURE);
+            }
+        } else if (checkingForChildProcess > 0 ) {
+            wait(); // waits for child process to finish
+        } else {
+            fprint(errorMessage);
+            exit(EXIT_FAILURE);
+        }
+    
+    }
+
+
+
+
+    else if ( CONTAINS A PATH TO A PROGRAM w/ ARGS > OUTPUT_FILE) {
+
+        char *arguments[];
+        
+        while (ALL ARGUMENTS ARE NOT STORED IN arguments[] ) {
+            ADD ALL THE AGUMENTS;
+        }
+
+        int pipe_fd[2]; // create pipe, a read end and write end
+
+        int checkingForChildProcess = fork();
+
+
+        if (checkingForChildProcess == 0 ) {
+            switch:
+                read end of pipe will be set to the stdIN of OUTPUT_FILE
+                write end of the pipe will be set to the STDOUT of the program
+            
+            if ( execv (PATH_TO_PROGRAM, arguments) < 0 ) {
+                printf("FAIL");
+                exit(EXIT_FAILURE);
+            }
+        }else if (checkingForChildProcess > 0 ) {
+            wait(); // waits for child process to finish
+        } else {
+            fprint(errorMessage);
+            exit(EXIT_FAILURE);
+        }
+    }
+
+
+    else if (  CONTAINS A PATH TO A PROGRAM | CONTAINS A PATH TO A PROGRAM | CONTAINS A PATH TO A PROGRAM) {
+        
+        // get all the command line inputs
+        
+        // Use ENVIORMENTAL PATH Vairable somewhere here
+
+        // parse that path by seperating by seperating via |
+
+        While (current.Program.next != NULL) {
+            // keep going until you are at the last program
+
+            // get the current programs execuatable name and its args
+
+            create a pipe w/ read adn write ends
+
+            fork()
+
+            if (child) {
+                Set input of the proc to the read end of pipe
+                If we are not at the last prgram, set out put to of proc to the write end of the pipe.
+                execv(the output)
+            }else if (parent) {
+                wait()
+                close write end of pipe()
+                save read end of pipe for the next program
+            }else{
+                FAIL_TO_PIPE
+                exit(EXIT_FAILURE);
+            }
+
+            incriment to next program path ++;
+
+        }
+
+
+        
+    }
+
+}
+

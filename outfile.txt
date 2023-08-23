@@ -1,0 +1,17 @@
+HELLO ALEX
+HERE!
+we
+go!elpers.c
+helpers.h
+helpers.o
+help.txt
+inputFile.txt
+makefile
+outfile.txt
+printFile
+printFile.c
+pseudocode.txt
+README.md
+shell
+shell.c
+shell.o

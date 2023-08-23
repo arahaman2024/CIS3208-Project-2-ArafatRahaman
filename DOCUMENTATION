@@ -1,0 +1,169 @@
+/*
+
+Arafat Rahaman
+shell Project
+DOCUMENTATION 
+
+*/
+
+[GitHub]
+    github: https://github.com/CIS-3207-S23/project-2-s23-arafatrahaman1
+
+
+
+[HOW_IT_WORKS]
+
+- This shell runs on an infinite while loop, until the "exit" built in is called.
+
+- Has 5 built-in commands
+    1. exit - just calls break, thus killing the while loop, which kills the program.
+
+    2. help  - utilizes the printHelp() function in the helper.c file to print the help menu. Similar to bash shell's man page.
+    
+    3. pwd - prints current work directory using a function in the helpers.c file. The  function is called printWD().
+    
+    4. cd (needs argument of destination) - changes the current work directory. Utilizes the chdir(input) to change the current work directory.
+    
+    5. wait - Waits for all the children processs that are in the background to finish. Utilizes the waitBi() function in helper.c file
+
+- Has 9 helper.c funtions uses 
+    1. int printWD();
+        // Arguments: N/A
+        // Return: 0 upon success, if it fails it just exits the program.
+        // Functionality: uses getcwd to get the current work directory, and prints it
+
+    2. char ** parse(char*line, char*delim);
+        // Arguments: input to the shell, space character (used to seperate individual strings)
+        // Return: point to a point to an array of strings
+        // Functionality: mallocs memory to store the input recieved to the shell and pareses it. The returned array can then be used to to execute commands in the shell. NULL is attached as the last 
+        thing in the returned array.
+
+    3. int find_special (char*args[], char * special);
+        // Arguments: takes in the an array of strings, and a special character
+        // Return: returns the index of the first instance of the passed special char, -1 if no special char was found
+        // Functionality: Goes throught the passed in string and looks for special char
+
+    4. char * check_for_path (char *name);
+        // Arguments: pointer to a string (something like ls, wc, executableProgram)
+        // Return: NULL if an executable wasnt found, if found the full path name to the executable
+        // Functionality: uses the PATH enviornmental varaible, and looks for the passed in strings full path, and if its an executable. Checks each PATH varaibel files.
+
+    5. char * helpFile_check_for_path (char *name);
+        // Arguments: pointer to a string (something like ls, wc, executableProgram)
+        // Return: return NULL if the given file wasn't a text file. Returns the exact path variable to the input text file
+        // Functionality: ONLY used for the printHelp() function, and is used to find the path the help.txt file. Wont work at all if the current work directory isnt the same the program's work directory. 
+        Like if you changed using cd in the shell. 
+
+    6. void printHelp();
+        // Arguments: N/A
+        // Return: N/A
+        // Functionality: void function with no args that finds the help.txt file using the enviornment PATH varaiable. Finds the file and prints the contents which contain a manual of some sort to the shell. 
+        Utilizes helpFile_check_for_path (char *name).
+
+    7. char * lastArg(char **array);
+        // Arguments: pointer to an array of strings
+        // Return: returns pointer to the last thing before the NULL in the array
+        // Functionality: returns pointer to the last thing before the NULL in the array
+
+    8. int lastIndex(char **array);
+        // Arguments: pointer to an array of strings
+        // Return: returns the index of the last thing in the array before the NULL
+        // Functionality: returns the index of the last thing in the array before the NULL
+
+    9. void waitBi();
+        // Arguments: N/A
+        // Return: N/A
+        // Functionality: used in the wait built-in where it waits for all the children process to finish.
+
+- Cases
+    1. NOT a built-in & No input, output, piping (ls, or an executable) - this utilizes check_for_path (char *name) function in the helper.c file. When a potential executable command is passed to 
+    the shell, it looks for a path to that file, and executes it if its in any of the PATH variable files. Prints to the screen. No redirection.
+
+    2. One " < " is passed with executable command, and input file - this utilizes check_for_path (char *name) function in the helper.c file. When a potential executable command is passed to the 
+    shell, it looks for a path to that file, and executes it if its in any of the PATH variable files. It then looks for the the inputFile in the CWD, if not found then fails. Asks for you to try 
+    again. If it is found then uses dup2() to redirect the input of the exectuable to the inputFIle. It uses execv() to then execute the executable file. If the executable file wasn't found then it fails.
+
+    3. One " > " is passed with executable command, and output file - this utilizes check_for_path (char *name) function in the helper.c file. When a potential executable command is passed to the shell, 
+    it looks for a path to that file, and executes it if its in any of the PATH variable files. It then looks for the the outputFile in the CWD, if not found then it creates it. Asks for you to try again. 
+    If it is found then uses dup2() to redirect the output of the exectuable to the outputFile. It uses execv() to then execute the executable file. If the executable file wasn't found then it fails.
+
+    4. Both "<" and ">" is passed with an exectuable command - this utilizes check_for_path (char *name) function in the helper.c file. When a potential executable command is passed to the shell, it looks 
+    for a path to that file, and executes it if its in any of the PATH variable files. It then looks for the the outputFile in the CWD, if not found then it creates it. Asks for you to try again. If it is 
+    found then uses dup2() to redirect the output of the exectuable to the outputFile. It then looks for the the inputFile in the CWD, if not found then fails. Asks for you to try again. If it is found then 
+    uses dup2() to redirect the input of the exectuable to the inputFIle.It uses execv() to then execute the executable file. If the executable file wasn't found then it fails.
+
+    5. One or more "|" and with executables and arguments for those executables betweeen each "|" (pipe) - All these cases are part of an if else statement logic gates, and at this point, it is true that the 
+    parser can only get to | without any redirects. If there was a redirect it would fail to get to pipes. And for any other thing the program would not recognize it. This program utilizes pipes. It has the max 
+    potenital of 1024 pipes, or 1025 process. This numnber was given by the TA. This function first creates many pipes as forementioned. It then figures out the number of process, which will be used to figure out 
+    how many times the for-loop is going to be used. It uses the total int varaible to keep track of the index of pipes and comName to figure out the location of the the next executable name. pipeIndex is used to 
+    turn the | into NULL. Essentially each time we fork and exec, comName is used as the execv first arg, and then from that point and forward is arg2 which is the arguemnts for the exectable. Becuase (if there 
+    is pipe) the pipe is turned into NULL, it will execv arg2 up until that NULL-pipe. So now to the for-loop. The for loop runs for each process. For the first proc one the std-out is redirected to the fd[0][1], 
+    and for all subsequent process this is done, but also the stdin put is redirected to fd[0][0]. The fd's are file descriptors and a 2D array is used. essentially the first process writes to the write end of the 
+    first pipe, and subsequent pipe reads from the read end of the same pipe. In the for loop i is used to keep track of the 2D array pipe index. After redircting. and this is done everytime, all fd's are closed. 
+    And the program execs. If there is more programs it runs again, and again until the end. 
+
+    IMPORTANT & - can be passed after all of these, and if it passed the process command will run in the background.
+
+- IMPORTANT EXTRAS
+    1. background processing (&) and how it is handled - this is handled very early. Essentially when an input is recieved we check if the last argument is an "&" ampersand. If it is, we turn it to NULL. And 
+    we continue as usual. The way it is later handled is in each parent else statement, if a & was passed (we know because if it was we change the int variable bg to 1), we call waitpid but with the flag WNOHANG 
+    which allows the parent function (the shell) to keep running and let the process run in the background.
+    2. After every iteration of the shell while loop program runs [waitpid(-1, &status, WNOHANG);] which reaps any child process that died and wasn't reaped before. This is to kill process that were once running 
+    in the background that had died and not been reaped.
+
+    3. This bit of code takes in like wc and returns the exect path using the enviornmental path varaible.
+    if (*array[0] != '/' || *array[0] != '.') {
+        char *executable = check_for_path(array[0]);
+        if (executable != NULL) {
+            array[0] = executable;
+        }else{
+            printf("Couldn't find executable command.\n");
+            continue;
+        }
+    }
+
+[HOW_IT_COMPILES]
+Utilizes a make file.
+- Compile: make
+- Run: shell
+
+
+[TESTING]
+1. Built-Ins - tested by simply calling them and checking if each worked as they should. They did.
+2. File output redirection
+    - ls > outfile.txt - works, creates it if it doesnt exist
+    - asdafasd > outfile.txt - fails because asdafasd isn't an executable
+3. File input redirection - used my own executable called printFile which is just cat. It takes in the std input and prints it line by line.
+    - printFile < inputfile.txt - works, fails if inputfile.txt doesnt exist
+4. Both redirection <, > 
+    - tested using printArgs < inputFile.txt > outputFile.txt 
+        - works if everything is straight
+        - fails if inputFile doesn't exist, or executable doesnt exits
+    - tested wronglt placed args. 
+        - com < > in out
+        - < com in > out
+        - in < out > com
+        - etc.
+5. Pipes (Indefinite)
+    ~AShell: ls | wc
+        16      16     165
+    ~AShell: ls | grep shell | grep shell | wc
+        3       3      22
+    - ran bunch of test cases where I gave wrong executable, indefinite piping and so forth.
+
+[Toubles]
+    - Pipe redirection. Got it to work eventually.
+    - Waitpid and its flags and how they are used.
+    - Lots of error checking it print statements.
+
+[Unresolved_Bugs]
+    - Maybe 1 or 2 because it was near impossible to get this done on time, and make sure EVERY LAST BIT OF IT IS PERFECT. 
+    - Test cases given in the discord group chat by TA's worked.
+
+[Pseudocode]
+    - Pseudocode was essentially wrong. I used pipes to redirect the output of the child function to the parent and then
+    have it print in the parent. Also, my logic for pipes were all wrong. I did have the correct system calls but it was impossible
+    to account for everything in the pseudocode when we had just started. It was like you didn't know what issues we had with your
+    pseudocode until you went to implement them and when you tried to do it, you realized that it could not be implemnted exactly 
+    like you thought you could because of simplicities sake. I put in genuine effort into my pseudocode and did it to the best of 
+    my ability week one. If I could re-write it thought I would have made a lot of things better and easier.
